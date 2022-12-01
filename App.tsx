@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, View, Button} from 'react-native'
 import MapView from 'react-native-maps'
-import { Map, Modals, Panel, Input } from './components'
+import { Map, Modals, Panel, Input, List } from './components'
+import { SafeAreaView } from 'react-native-safe-area-context'
 type point = {
-	latitude?: number
-	longitude?: number
+	latitude: number
+	longitude: number
 }
 
-type inputPoints = {
+export type inputPoints = {
 	coordinate: point,
 	name: string
 }[]
@@ -16,16 +17,24 @@ interface StateApp  {
 	namePoint: string
 	tempPoint: point 
 	modal: boolean
+	filter: string
+	visibilityPoints: boolean
 }
-
+const DEFAULT_POINT: point = {
+	latitude: 0,
+	longitude: 0
+}
 export default function App() {
 	const [points,setPoints]= useState<StateApp['inputPoints']>([])
-	const [temPoints,setTempPoints]= useState<StateApp['tempPoint']>({})
+	const [temPoints,setTempPoints]= useState<StateApp['tempPoint']>(DEFAULT_POINT)
 	const [namePoint,setNamePoint]= useState<StateApp['namePoint']>("")
+	const [filterVisibility,setFilterVisibility]= useState<StateApp['filter']>("") //new_point or all_point
 	const [toggleModal,setToggleModal]= useState<StateApp['modal']>(false)
+	const [visibilityPoints,setVisibilityPoints]= useState<StateApp['visibilityPoints']>(true)
 	
 
 	function handleLongPress(point: any) {
+		setFilterVisibility("new_point")
 		setTempPoints(point.coordinate)
 		setToggleModal(true)
 	}
@@ -35,37 +44,72 @@ export default function App() {
 		setToggleModal(false)
 
 	}
-	console.log(points)
+	const handleList = () => {
+		setFilterVisibility("all_point")
+		setToggleModal(true)
+	}
+	const handClose = () => {
+		setToggleModal(false)
+	}
+	const handleShowPoints = () => {
+		setVisibilityPoints(!visibilityPoints)
+	}
 	return (
-		<View style={styles.container}>
-			<Map 
-				onLongPress={handleLongPress}
-			/>
-			<Panel />
-			<Modals 
-				visibility={toggleModal}
-			>
-				<Input 
-					title="Name"
-					placeholder="Write name point"
-					onChangeText={(name) => setNamePoint(name)}
-					style={styles.input}
+		<SafeAreaView
+			edges={['top']}
+			style={styles.containerApp}
+		>
+			<View style={styles.container}>
+				<Map 
+					onLongPress={handleLongPress}
+					points={points}
+					showPoints={visibilityPoints}
 				/>
-				<Button 
-					title="Add"
-					onPress={handleSubmit}
+				<Panel
+					titleLeft='List'
+					onLeftPress={handleList}
+					titleRight="Show / Hide"
+					onRightPress={handleShowPoints}
+
 				/>
-			</Modals>
-		</View>
+				<Modals 
+					visibility={toggleModal}
+				>
+					{filterVisibility === "new_point" ?
+						<View style={styles.form}>
+							<Input 
+								title="Name"
+								placeholder="Write name point"
+								onChangeText={(name) => setNamePoint(name)}
+								style={styles.input}
+							/>
+							<Button 
+								title="Add"
+								onPress={handleSubmit}
+							/>
+						</View>
+						:
+						<List 
+							points={points}
+							handleClose={handClose}
+						/>
+					}
+				</Modals>
+			</View>
+		</SafeAreaView>
 	)
 }
 
 const styles = StyleSheet.create({
+	containerApp:{
+		flex: 1,
+		backgroundColor: '#fff',
+	},
 	container: {
 		flex: 1,
 		backgroundColor: '#fff',
-		alignItems: 'center',
-		justifyContent: 'flex-start',
+		// alignItems: 'center',
+	
 	},
 	input:{
 		backgroundColor: "#cccc",
@@ -73,5 +117,8 @@ const styles = StyleSheet.create({
 		padding: 5,
 		
 	},
+	form:{
+		padding: 20,
+	}
 	
 })

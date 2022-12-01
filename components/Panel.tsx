@@ -1,10 +1,24 @@
-import { StyleSheet, Dimensions, Button, View } from 'react-native'
+import { StyleSheet, Button, View } from 'react-native'
 
-export const Panel = () => {
+interface PropsPanel {
+	onLeftPress : () => void
+	onRightPress : () => void
+	titleLeft : string
+	titleRight : string
+
+}
+
+export const Panel = ({onLeftPress,titleLeft,titleRight, onRightPress}: PropsPanel) => {
 	return(
 		<View style={styles.panel}>
-			<Button title='List'/>
-			<Button title='Show/Hide'/>
+			<Button 
+				title={titleLeft}
+				onPress={onLeftPress}
+			/>
+			<Button 
+				title={titleRight}
+				onPress={onRightPress}
+			/>
 		</View>
 	)
 }

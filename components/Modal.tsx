@@ -6,35 +6,45 @@ interface PropsModals {
 }
 export const Modals = ({children,visibility}:PropsModals) => {
 	return(
-		<Modal
-			animationType='slide'
-			transparent={true}
-			visible={visibility}
-		>
-			<View style={styles.center}>
-				<View style={styles.modalView}>
-					{children}
+		<View style={styles.container}>
+			<Modal
+				animationType='slide'
+				transparent={true}
+				visible={visibility}
+			>
+				<View style={styles.center}>
+					<View style={styles.modalView}>
+						{children}
+					</View>
 				</View>
-			</View>
 
-		</Modal>
+			</Modal>
+
+		</View>
 	)
 }
 
 const styles = StyleSheet.create({
+	container:{
+		flex: 1,
+		justifyContent: 'flex-start'
+		
+	},
 	center:{
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
+		backgroundColor: 'rgba(0,0,0,0.3)',
+		alignSelf: "stretch"
 	},
 	modalView: {
 		backgroundColor: "#fff",
 		borderRadius: 4,
-		padding: 20,
 		shadowColor: "#000",
 		shadowOffset:{
 			width: 0,
 			height:3,
-		}
+		},
+		width: Dimensions.get('window').width - 150
 	},
 })
